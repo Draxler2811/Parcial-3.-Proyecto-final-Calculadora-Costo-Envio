@@ -1,3 +1,4 @@
+import 'package:calculado_a_costo_envio/services/paqueteservice.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:calculado_a_costo_envio/models/paquete.dart';
 import 'package:calculado_a_costo_envio/services/envio_service.dart';
@@ -17,6 +18,7 @@ class _HomeEnvioState extends State<HomeEnvio> {
   final _anchoController = TextEditingController();
   final _altoController = TextEditingController();
   final _destinoController = TextEditingController();
+  final _paqueteService = PaqueteService(); // Instancia del servicio
   double _costoEnvio = 0.0;
 
   void _calcularCosto() {
@@ -35,6 +37,10 @@ class _HomeEnvioState extends State<HomeEnvio> {
         destino: destino,
       );
 
+      // Agregar el paquete al servicio
+      _paqueteService.agregarPaquete(paquete);
+
+      // Calcular el costo de envío
       final costo = EnvioService().calcularCostoEnvio(paquete);
 
       setState(() {
