@@ -14,7 +14,8 @@ class Paquete {
   });
 
   double volumen() {
-    return largo * ancho * alto;
+    // Convertir cm a metros para el cálculo de volumen en metros cúbicos
+    return (largo / 100) * (ancho / 100) * (alto / 100);
   }
 
   factory Paquete.fromJson(Map<String, dynamic> json) {
