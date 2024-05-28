@@ -1,118 +1,50 @@
 import 'package:calculado_a_costo_envio/services/paqueteservice.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:calculado_a_costo_envio/models/paquete.dart';
 import 'package:calculado_a_costo_envio/services/envio_service.dart';
-import 'package:calculado_a_costo_envio/widgets/input_field.dart';
-import 'package:calculado_a_costo_envio/widgets/custome_button.dart';
+import 'package:calculado_a_costo_envio/screens/AgregarPaquete.dart';
 
 class HomeEnvio extends StatefulWidget {
-  const HomeEnvio({Key? key}) : super(key: key);
-
   @override
   _HomeEnvioState createState() => _HomeEnvioState();
 }
 
 class _HomeEnvioState extends State<HomeEnvio> {
-  final _pesoController = TextEditingController();
-  final _largoController = TextEditingController();
-  final _anchoController = TextEditingController();
-  final _altoController = TextEditingController();
-  final _destinoController = TextEditingController();
-  final _paqueteService = PaqueteService(); // Instancia del servicio
-  double _costoEnvio = 0.0;
-
-  void _calcularCosto() {
-    try {
-      final double peso = double.parse(_pesoController.text);
-      final double largo = double.parse(_largoController.text);
-      final double ancho = double.parse(_anchoController.text);
-      final double alto = double.parse(_altoController.text);
-      final String destino = _destinoController.text;
-
-      final paquete = Paquete(
-        peso: peso,
-        largo: largo,
-        ancho: ancho,
-        alto: alto,
-        destino: destino,
-      );
-
-      // Agregar el paquete al servicio
-      _paqueteService.agregarPaquete(paquete);
-
-      // Calcular el costo de envío
-      final costo = EnvioService().calcularCostoEnvio(paquete);
-
-      setState(() {
-        _costoEnvio = costo;
-      });
-    } catch (e) {
-      // Maneja errores de conversión y muestra un mensaje de error
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: Text('Error'),
-            content: Text('Por favor, ingresa valores válidos.'),
-            actions: <Widget>[
-              CupertinoDialogAction(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
+  final PaqueteService _paqueteService = PaqueteService();
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
+      navigationBar: CupertinoNavigationBar(
         middle: Text('Calculadora de Costos de Envío'),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: 20), // Espacio adicional para evitar solapamiento con el encabezado
-            InputField(
-              controller: _pesoController,
-              placeholder: 'Peso (kg)',
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-            ),
-            InputField(
-              controller: _largoController,
-              placeholder: 'Largo (cm)',
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-            ),
-            InputField(
-              controller: _anchoController,
-              placeholder: 'Ancho (cm)',
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-            ),
-            InputField(
-              controller: _altoController,
-              placeholder: 'Alto (cm)',
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-            ),
-            InputField(
-              controller: _destinoController,
-              placeholder: 'Destino',
-            ),
-            SizedBox(height: 20), // Espacio adicional entre los campos y el botón
-            CustomButton(
-              text: 'Calcular Costo',
-              onPressed: _calcularCosto,
-            ),
-            SizedBox(height: 20), // Espacio adicional entre el botón y el resultado
-            Text('Costo de Envío: \$$_costoEnvio'),
-          ],
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Icon(Icons.add),
+          onPressed: () async {
+            final nuevoPaquete = await Navigator.push(
+              context,
+              CupertinoPageRoute(builder: (context) => AgregarPaqueteScreen()),
+            );
+            if (nuevoPaquete != null) {
+              setState(() {
+                _paqueteService.agregarPaquete(nuevoPaquete);
+              });
+            }
+          },
         ),
+      ),
+      child: ListView.builder(
+        itemCount: _paqueteService.obtenerPaquetes().length,
+        itemBuilder: (context, index) {
+          final paquete = _paqueteService.obtenerPaquetes()[index];
+          return Card(
+            child: ListTile(
+              title: Text('Peso: ${paquete.peso} kg'),
+              subtitle: Text('Dimensiones: ${paquete.largo}x${paquete.ancho}x${paquete.alto} cm\nDestino: ${paquete.destino}\nCosto de envío: ${EnvioService().calcularCostoEnvio(paquete)}'),
+            ),
+          );
+        },
       ),
     );
   }

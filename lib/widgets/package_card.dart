@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
-import 'package:calculado_a_costo_envio/models/paquete.dart';
 import 'package:flutter/material.dart';
+import 'package:calculado_a_costo_envio/models/paquete.dart';
 
 class PackageCard extends StatelessWidget {
   final Paquete paquete;

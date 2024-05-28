@@ -14,7 +14,6 @@ class Paquete {
   });
 
   double volumen() {
-    // Convertir cm a metros para el cálculo de volumen en metros cúbicos
     return (largo / 100) * (ancho / 100) * (alto / 100);
   }
 
