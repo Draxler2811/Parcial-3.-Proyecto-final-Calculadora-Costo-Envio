@@ -1,14 +1,14 @@
 import 'package:calculado_a_costo_envio/models/paquete.dart';
 
 class PaqueteService {
-  List<Paquete> _paquetes = [];
+  final List<Paquete> _paquetes = [];
+
+  List<Paquete> obtenerPaquetes() {
+    return _paquetes;
+  }
 
   void agregarPaquete(Paquete paquete) {
     _paquetes.add(paquete);
-  }
-
-  List<Paquete> obtenerPaquetes() {
-    return List.from(_paquetes);
   }
 
   void actualizarPaquete(int index, Paquete paquete) {
