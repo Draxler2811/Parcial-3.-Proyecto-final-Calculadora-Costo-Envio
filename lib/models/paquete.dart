@@ -1,4 +1,5 @@
 class Paquete {
+  int? id;
   double peso;
   double largo;
   double ancho;
@@ -6,6 +7,7 @@ class Paquete {
   String destino;
 
   Paquete({
+    this.id,
     required this.peso,
     required this.largo,
     required this.ancho,
@@ -13,12 +15,9 @@ class Paquete {
     required this.destino,
   });
 
-  double volumen() {
-    return (largo / 100) * (ancho / 100) * (alto / 100);
-  }
-
   factory Paquete.fromJson(Map<String, dynamic> json) {
     return Paquete(
+      id: json['id'],
       peso: json['peso'],
       largo: json['largo'],
       ancho: json['ancho'],
@@ -29,11 +28,16 @@ class Paquete {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'peso': peso,
       'largo': largo,
       'ancho': ancho,
       'alto': alto,
       'destino': destino,
     };
+  }
+
+  double volumen() {
+    return largo * ancho * alto / 1000000; // Volumen en metros cúbicos si las dimensiones están en cm
   }
 }

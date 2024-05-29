@@ -33,8 +33,9 @@ class _EditarPaqueteScreenState extends State<EditarPaqueteScreen> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text('Editar Paquete',
-        style: TextStyle(color: Colors.white)
+        middle: Text(
+          'Editar Paquete',
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blueGrey[900],
         automaticallyImplyLeading: false,
@@ -113,6 +114,7 @@ class _EditarPaqueteScreenState extends State<EditarPaqueteScreen> {
                     child: Text('Guardar Cambios'),
                     onPressed: () {
                       final paqueteEditado = Paquete(
+                        id: widget.paquete.id,
                         peso: double.parse(_pesoController.text),
                         largo: double.parse(_largoController.text),
                         ancho: double.parse(_anchoController.text),

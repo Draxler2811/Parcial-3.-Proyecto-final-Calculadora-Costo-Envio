@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calculado_a_costo_envio/models/paquete.dart';
-import 'package:calculado_a_costo_envio/services/envio_service.dart';
-import 'package:calculado_a_costo_envio/screens/AgregarPaquete.dart';
-import 'package:calculado_a_costo_envio/screens/EditarPaquete.dart';
+import 'package:calculado_a_costo_envio/screens/AgregarPaquete.dart' as agregar;
+import 'package:calculado_a_costo_envio/screens/EditarPaquete.dart' as editar;
 import 'package:calculado_a_costo_envio/services/paqueteservice.dart';
 
 class HomeEnvio extends StatefulWidget {
@@ -13,6 +12,24 @@ class HomeEnvio extends StatefulWidget {
 
 class _HomeEnvioState extends State<HomeEnvio> {
   final PaqueteService _paqueteService = PaqueteService();
+  List<Paquete> _paquetes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarPaquetes();
+  }
+
+  Future<void> _cargarPaquetes() async {
+    try {
+      final paquetes = await _paqueteService.obtenerPaquetes();
+      setState(() {
+        _paquetes = paquetes;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +46,11 @@ class _HomeEnvioState extends State<HomeEnvio> {
           onPressed: () async {
             final nuevoPaquete = await Navigator.push(
               context,
-              CupertinoPageRoute(builder: (context) => AgregarPaqueteScreen()),
+              CupertinoPageRoute(builder: (context) => agregar.AgregarPaqueteScreen()),
             );
             if (nuevoPaquete != null) {
-              setState(() {
-                _paqueteService.agregarPaquete(nuevoPaquete);
-              });
+              await _paqueteService.agregarPaquete(nuevoPaquete);
+              _cargarPaquetes();
             }
           },
         ),
@@ -48,11 +64,11 @@ class _HomeEnvioState extends State<HomeEnvio> {
               crossAxisCount: 3,
               crossAxisSpacing: 3.0,
               mainAxisSpacing: 3.0,
-              childAspectRatio:0.9,
+              childAspectRatio: 0.9,
             ),
-            itemCount: _paqueteService.obtenerPaquetes().length,
+            itemCount: _paquetes.length,
             itemBuilder: (context, index) {
-              final paquete = _paqueteService.obtenerPaquetes()[index];
+              final paquete = _paquetes[index];
               return Card(
                 color: Colors.blueGrey[700],
                 shape: RoundedRectangleBorder(
@@ -71,7 +87,7 @@ class _HomeEnvioState extends State<HomeEnvio> {
                         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                       Text(
-                        'Dimensiones: ${paquete.largo}x${paquete.ancho}x${paquete.alto} cm\nDestino: ${paquete.destino}\nCosto de envío: ${EnvioService().calcularCostoEnvio(paquete)}',
+                        'Dimensiones: ${paquete.largo}x${paquete.ancho}x${paquete.alto} cm\nDestino: ${paquete.destino}',
                         style: TextStyle(color: Colors.white),
                       ),
                       Row(
@@ -83,22 +99,20 @@ class _HomeEnvioState extends State<HomeEnvio> {
                             onPressed: () async {
                               final paqueteEditado = await Navigator.push(
                                 context,
-                                CupertinoPageRoute(builder: (context) => EditarPaqueteScreen(paquete: paquete, index: index)),
+                                CupertinoPageRoute(builder: (context) => editar.EditarPaqueteScreen(paquete: paquete, index: index)),
                               );
                               if (paqueteEditado != null) {
-                                setState(() {
-                                  _paqueteService.actualizarPaquete(index, paqueteEditado);
-                                });
+                                await _paqueteService.actualizarPaquete(paquete.id!, paqueteEditado);
+                                _cargarPaquetes();
                               }
                             },
                           ),
                           CupertinoButton(
                             padding: EdgeInsets.zero,
                             child: Icon(Icons.delete, color: Colors.redAccent),
-                            onPressed: () {
-                              setState(() {
-                                _paqueteService.eliminarPaquete(index);
-                              });
+                            onPressed: () async {
+                              await _paqueteService.eliminarPaquete(paquete.id!);
+                              _cargarPaquetes();
                             },
                           ),
                         ],

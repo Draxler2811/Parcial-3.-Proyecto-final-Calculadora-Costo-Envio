@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calculado_a_costo_envio/models/paquete.dart';
 
-
 class AgregarPaqueteScreen extends StatefulWidget {
   const AgregarPaqueteScreen({Key? key}) : super(key: key);
 
